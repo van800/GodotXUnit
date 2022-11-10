@@ -21,46 +21,34 @@ namespace GodotXUnitApi.Internal
 
         public static void CleanWorkDir()
         {
-            var directory = new Godot.Directory();
-            directory.MakeDirRecursive(WorkDir).ThrowIfNotOk();
-            directory.Open(WorkDir).ThrowIfNotOk();
-            directory.ListDirBegin(true, true).ThrowIfNotOk();
-            while (true)
+            using (var directory = DirAccess.Open(WorkDir))
             {
-                var next = directory.GetNext();
-                if (string.IsNullOrEmpty(next))
-                    break;
-                directory.Remove(next).ThrowIfNotOk();
+                directory.ListDirBegin();
+                while (true)
+                {
+                    var next = directory.GetNext();
+                    if (string.IsNullOrEmpty(next))
+                        break;
+                    directory.Remove(next);
+                }
+                directory.ListDirEnd();
             }
-            directory.ListDirEnd();
         }
 
         public static void WriteFile(string filename, object contents)
         {
             var writing = JsonConvert.SerializeObject(contents, Formatting.Indented, jsonSettings);
-            var file = new Godot.File();
-            file.Open(PathForResFile(filename), File.ModeFlags.WriteRead).ThrowIfNotOk();
-            try
+            using (var file = FileAccess.Open(PathForResFile(filename), FileAccess.ModeFlags.WriteRead))
             {
                 file.StoreString(writing);
-            }
-            finally
-            {
-                file.Close();
             }
         }
 
         public static object ReadFile(string filename)
         {
-            var file = new Godot.File();
-            file.Open(PathForResFile(filename), File.ModeFlags.Read).ThrowIfNotOk();
-            try
+            using (var file = FileAccess.Open(PathForResFile(filename), FileAccess.ModeFlags.Read))
             {
-                return JsonConvert.DeserializeObject(file.GetAsText(), jsonSettings);
-            }
-            finally
-            {
-                file.Close();
+                return JsonConvert.DeserializeObject(file.GetAsText(), jsonSettings);    
             }
         }
     }

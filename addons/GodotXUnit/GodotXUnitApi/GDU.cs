@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
 using Godot;
@@ -22,12 +23,27 @@ namespace GodotXUnitApi
     // await GDU.OnPhysicsProcessAwaiter;
     public static class GDU
     {
-        private static Node2D _instance;
+        private static Node _instance;
 
-        public static Node2D Instance
+        public static Node Instance
         {
-            get => _instance ?? throw new Exception("GDU not set");
-            set => _instance = value;
+            get
+            {
+                var instance = _instance;
+                
+                Console.WriteLine("AssemblyLoadContext:"+ AssemblyLoadContext.GetLoadContext(typeof(GDU).Assembly));
+                Console.WriteLine("_instance.Name " + (_instance ==null? "null":_instance));
+                Console.WriteLine("instance.Name "+(instance==null?"null":instance));
+                Console.WriteLine("AppDomain: "+ AppDomain.CurrentDomain.Id);
+                if (instance == null) throw new Exception("GDU not set");
+                return instance;
+            }
+            set
+            {
+                Console.WriteLine("Assembly:"+ AssemblyLoadContext.GetLoadContext(typeof(GDU).Assembly));
+                Console.WriteLine("Node: "+ value);
+                _instance = value;
+            }
         }
 
         public static SignalAwaiter OnProcessAwaiter =>
@@ -68,51 +84,51 @@ namespace GodotXUnitApi
                 await OnProcessAwaiter;
         }
         
-        /// <summary>
-        /// helper to wrap a SignalAwaiter to return the first element from a signal
-        /// result into the desired type.
-        /// </summary>
-        /// <param name="awaiter">the target signal to wrap</param>
-        /// <typeparam name="T">the type to cast to</typeparam>
-        /// <returns>the task that awaits and casts when resolved</returns>
-        public static async Task<T> AwaitType<T>(this SignalAwaiter awaiter)
-        {
-            return (T) (await awaiter)[0];
-        }
-        
-        /// <summary>
-        /// creates a task for a godot signal with a timeout.
-        /// </summary>
-        /// <param name="source">the object that emits the signal</param>
-        /// <param name="signal">the signal to wait for</param>
-        /// <param name="timeoutMillis">the amount of millis before a timeout happens</param>
-        /// <param name="throwOnTimeout">makes this task throw an exception on timeout. otherwise, just resolves</param>
-        /// <returns>the new task with the given timeout</returns>
-        /// <exception cref="TimeoutException">only throws if throwOnTimeout is true</exception>
-        public static async Task<object[]> ToSignalWithTimeout(
-            this Godot.Object source,
-            string signal,
-            int timeoutMillis,
-            bool throwOnTimeout = true)
-        {
-            return await source.ToSignal(source, signal).AwaitWithTimeout(timeoutMillis, throwOnTimeout);
-        }
-        
-        /// <summary>
-        /// wraps the given SignalAwaiter in a task with a timeout.
-        /// </summary>
-        /// <param name="awaiter">the signal to add a timeout to</param>
-        /// <param name="timeoutMillis">the amount of millis before a timeout happens</param>
-        /// <param name="throwOnTimeout">makes this task throw an exception on timeout. otherwise, just resolves</param>
-        /// <returns>the new task with the given timeout</returns>
-        /// <exception cref="TimeoutException">only throws if throwOnTimeout is true</exception>
-        public static Task<object[]> AwaitWithTimeout(
-            this SignalAwaiter awaiter,
-            int timeoutMillis,
-            bool throwOnTimeout = true)
-        {
-            return Task.Run(async () => await awaiter).AwaitWithTimeout(timeoutMillis, throwOnTimeout);
-        }
+        // // /// <summary>
+        // // /// helper to wrap a SignalAwaiter to return the first element from a signal
+        // // /// result into the desired type.
+        // // /// </summary>
+        // // /// <param name="awaiter">the target signal to wrap</param>
+        // // /// <typeparam name="T">the type to cast to</typeparam>
+        // // /// <returns>the task that awaits and casts when resolved</returns>
+        // // public static async Task<T> AwaitType<T>(this SignalAwaiter awaiter)
+        // // {
+        // //     return (T) (await awaiter)[0];
+        // // }
+        // //
+        // /// <summary>
+        // /// creates a task for a godot signal with a timeout.
+        // /// </summary>
+        // /// <param name="source">the object that emits the signal</param>
+        // /// <param name="signal">the signal to wait for</param>
+        // /// <param name="timeoutMillis">the amount of millis before a timeout happens</param>
+        // /// <param name="throwOnTimeout">makes this task throw an exception on timeout. otherwise, just resolves</param>
+        // /// <returns>the new task with the given timeout</returns>
+        // /// <exception cref="TimeoutException">only throws if throwOnTimeout is true</exception>
+        // public static async Task<object[]> ToSignalWithTimeout(
+        //     this Godot.Object source,
+        //     string signal,
+        //     int timeoutMillis,
+        //     bool throwOnTimeout = true)
+        // {
+        //     return await source.ToSignal(source, signal).AwaitWithTimeout(timeoutMillis, throwOnTimeout);
+        // }
+        //
+        // /// <summary>
+        // /// wraps the given SignalAwaiter in a task with a timeout.
+        // /// </summary>
+        // /// <param name="awaiter">the signal to add a timeout to</param>
+        // /// <param name="timeoutMillis">the amount of millis before a timeout happens</param>
+        // /// <param name="throwOnTimeout">makes this task throw an exception on timeout. otherwise, just resolves</param>
+        // /// <returns>the new task with the given timeout</returns>
+        // /// <exception cref="TimeoutException">only throws if throwOnTimeout is true</exception>
+        // public static Task<object[]> AwaitWithTimeout(
+        //     this SignalAwaiter awaiter,
+        //     int timeoutMillis,
+        //     bool throwOnTimeout = true)
+        // {
+        //     return Task.Run(async () => await awaiter).AwaitWithTimeout(timeoutMillis, throwOnTimeout);
+        // }
         
         /// <summary>
         /// wraps a task with a task that will resolve after the wrapped task

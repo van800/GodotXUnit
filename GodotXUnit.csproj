@@ -1,56 +1,34 @@
-﻿<Project Sdk="Godot.NET.Sdk/3.3.0">
+﻿<Project Sdk="Godot.NET.Sdk/4.0.0-beta.4">
   <PropertyGroup>
-    <ProjectGuid>{B6A000AB-04AE-4D1E-A0D5-93911E363F6D}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>GodotXUnit</RootNamespace>
-    <AssemblyName>GodotXUnit</AssemblyName>
-    <GodotProjectGeneratorVersion>1.0.0.0</GodotProjectGeneratorVersion>
-    <LangVersion>8</LangVersion>
-    <TargetFramework>net472</TargetFramework>
-    <!--The following properties were overriden during migration to prevent errors.
-    Enabling them may require other manual changes to the project and its files.-->
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GodotUseNETFrameworkRefAssemblies>true</GodotUseNETFrameworkRefAssemblies>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     <Deterministic>false</Deterministic>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
+    <None Include="**/*.tscn" />
+    <None Remove="ClassLibrary1\**" />
+    <None Remove="addons\GodotXUnit\GodotXUnitApi\**" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="addons\GodotXUnit\Plugin.cs" />
-    <Compile Include="addons\GodotXUnit\GodotTestRunner.cs" />
-    <Compile Include="addons\GodotXUnit\runner\RiderTestRunner\Runner.cs" Condition="'$(Configuration)' == 'Debug' " />
-    <Compile Include="addons\GodotXUnit\XUnitDock.cs" />
-    <Compile Include="tests\ClickTest.cs" />
-    <Compile Include="tests\DebugDrawingTest.cs" />
-    <Compile Include="tests\PhysicsCollisionTest.cs" />
-    <Compile Include="tests\SomeBasicTests.cs" />
-    <Compile Include="tests\SomePrintStatementsTest.cs" />
-    <Compile Include="tests\SomeTestSceneTest.cs" />
-    <Compile Include="tests\TestInGodotCycle.cs" />
-    <Compile Include="tests\TestInGodotTree.cs" />
-    <Compile Include="tests\TestWithSetup.cs" />
-    <Compile Include="test_scenes\AVerySpecialBall.cs" />
-    <Compile Include="test_scenes\ClickButtonThing.cs" />
-    <Compile Include="test_scenes\SomeTestSceneRoot.cs" />
+    <Compile Remove="projects\**" />
+    <Compile Remove="ClassLibrary1\**" />
+    <Compile Remove="addons\GodotXUnit\GodotXUnitApi\**" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include=".gitattributes" />
-    <Content Include=".github\workflows\build.yaml" />
-    <Content Include="addons\GodotXUnit\.gitignore" />
-    <Content Include="addons\GodotXUnit\LICENSE" />
-    <Content Include="addons\GodotXUnit\plugin.cfg" />
-    <Content Include="addons\GodotXUnit\README" />
-    <Content Include="addons\GodotXUnit\runner\EmptyScene.tscn" />
-    <Content Include="addons\GodotXUnit\runner\GodotTestRunnerScene.tscn" />
-    <Content Include="addons\GodotXUnit\runner\RiderTestRunner\Runner.tscn" Condition="'$(Configuration)' == 'Debug' "/>
-    <Content Include="addons\GodotXUnit\XUnitDock.tscn" />
-    <Content Include="addons\GodotXUnit\_work\.gdignore" />
+    <EmbeddedResource Remove="projects\**" />
+    <EmbeddedResource Remove="ClassLibrary1\**" />
+    <EmbeddedResource Remove="addons\GodotXUnit\GodotXUnitApi\**" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="addons\GodotXUnit\GodotXUnitApi\GodotXUnitApi.csproj">
-      <Project>{06417ca9-47a6-44c4-b5d9-d623f0ff10a4}</Project>
-      <Name>GodotXUnitApi</Name>
-    </ProjectReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="addons\GodotXUnit\GodotXUnitApi\GodotXUnitApi.csproj" />
   </ItemGroup>
 </Project>

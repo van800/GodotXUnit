@@ -1,5 +1,4 @@
 using GodotXUnitApi;
-using GodotXUnitTest;
 using Xunit;
 
 namespace SubProjectForIntegrationTests
@@ -12,12 +11,12 @@ namespace SubProjectForIntegrationTests
     /// </summary>
     public class RealFailingTests
     {
-        [GodotFact(Scene = "res://SomeSceneNotFound.tscn")]
-        public void SceneUnableToBeFound()
-        {
-            GDU.Print("this will fail");
-            var scene = GDU.CurrentScene;
-            Assert.Equal(typeof(SomeTestSceneRoot), scene?.GetType());
-        }
+        // [GodotFact(Scene = "res://SomeSceneNotFound.tscn")]
+        // public void SceneUnableToBeFound()
+        // {
+        //     GDU.Print("this will fail");
+        //     var scene = GDU.CurrentScene;
+        //     Assert.Equal(typeof(SomeTestSceneRoot), scene?.GetType());
+        // }
     }
 }

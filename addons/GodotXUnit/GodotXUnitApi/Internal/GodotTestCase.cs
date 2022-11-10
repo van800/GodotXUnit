@@ -213,7 +213,7 @@ namespace GodotXUnitApi.Internal
             {
                 // you must be in the process frame to 
                 await GDU.OnProcessAwaiter;
-                if (GDU.Instance.GetTree().ChangeScene(sceneCheck) != Error.Ok)
+                if (GDU.Instance.GetTree().ChangeSceneToFile(sceneCheck) != Error.Ok)
                 {
                     Aggregator.Add(new Exception($"could not load scene: {sceneCheck}"));
                     return;
@@ -270,7 +270,7 @@ namespace GodotXUnitApi.Internal
             if (loadEmptyScene)
             {
                 // change scenes again and wait for godot to catch up
-                GDU.Instance.GetTree().ChangeScene(Consts.EMPTY_SCENE_PATH);
+                GDU.Instance.GetTree().ChangeSceneToFile(Consts.EMPTY_SCENE_PATH);
                 await GDU.OnIdleFrameAwaiter;
                 await GDU.OnIdleFrameAwaiter;
                 await GDU.OnProcessAwaiter;

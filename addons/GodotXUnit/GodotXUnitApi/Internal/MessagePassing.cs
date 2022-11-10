@@ -19,31 +19,31 @@ namespace GodotXUnitApi.Internal
 
     public class MessageWatcher
     {
-        private Directory directory = new Directory();
-        
         public object Poll()
         {
-            directory.ChangeDir(WorkFiles.WorkDir).ThrowIfNotOk();
-            directory.ListDirBegin(true, true).ThrowIfNotOk();
-            try
+            using (var directory = DirAccess.Open(WorkFiles.WorkDir))
             {
-                while (true)
+                directory.ListDirBegin();
+                try
                 {
-                    var next = directory.GetNext();
-                    if (string.IsNullOrEmpty(next)) break;
-                    if (directory.FileExists(next))
+                    while (true)
                     {
-                        var result = WorkFiles.ReadFile(next);
-                        directory.Remove(next);
-                        return result;
+                        var next = directory.GetNext();
+                        if (string.IsNullOrEmpty(next)) break;
+                        if (directory.FileExists(next))
+                        {
+                            var result = WorkFiles.ReadFile(next);
+                            directory.Remove(next);
+                            return result;
+                        }
                     }
                 }
+                finally
+                {
+                    directory.ListDirEnd();
+                }
+                return null;    
             }
-            finally
-            {
-                directory.ListDirEnd();
-            }
-            return null;
         }
     }
 }

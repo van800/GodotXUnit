@@ -9,7 +9,7 @@ using Directory = System.IO.Directory;
 
 namespace GodotXUnitApi.Internal
 {
-    public abstract class GodotXUnitRunnerBase : Node2D
+    public abstract partial class GodotXUnitRunnerBase : Node
     {
         protected virtual Assembly GetTargetAssembly(GodotXUnitSummary summary)
         {
@@ -58,27 +58,27 @@ namespace GodotXUnitApi.Internal
         protected virtual string GetTargetClass(GodotXUnitSummary summary)
         {
             return ProjectSettings.HasSetting(Consts.SETTING_TARGET_CLASS)
-                ? ProjectSettings.GetSetting(Consts.SETTING_TARGET_CLASS)?.ToString()
+                ? ProjectSettings.GetSetting(Consts.SETTING_TARGET_CLASS).ToString()
                 : null;
         }
 
         protected virtual string GetTargetMethod(GodotXUnitSummary summary)
         {
             return ProjectSettings.HasSetting(Consts.SETTING_TARGET_METHOD)
-                ? ProjectSettings.GetSetting(Consts.SETTING_TARGET_METHOD)?.ToString()
+                ? ProjectSettings.GetSetting(Consts.SETTING_TARGET_METHOD).ToString()
                 : null;
         }
 
         private ConcurrentQueue<Action<Node2D>> drawRequests = new ConcurrentQueue<Action<Node2D>>();
 
         [Signal]
-        public delegate void OnProcess();
+        public delegate void OnProcessEventHandler();
 
         [Signal]
-        public delegate void OnPhysicsProcess();
+        public delegate void OnPhysicsProcessEventHandler();
 
         [Signal]
-        public delegate void OnDrawRequestDone();
+        public delegate void OnDrawRequestDoneEventHandler();
 
         public void RequestDraw(Action<Node2D> request)
         {
@@ -208,34 +208,35 @@ namespace GodotXUnitApi.Internal
 
         private void WriteSummary(GodotXUnitSummary testSummary)
         {
-            var location = ProjectSettings.HasSetting(Consts.SETTING_RESULTS_SUMMARY)
-                ? ProjectSettings.GetSetting(Consts.SETTING_RESULTS_SUMMARY).ToString()
-                : Consts.SETTING_RESULTS_SUMMARY_DEF;
-            var file = new Godot.File();
-            var result = file.Open(location, Godot.File.ModeFlags.Write);
-            if (result == Error.Ok)
-                file.StoreString(JsonConvert.SerializeObject(testSummary, Formatting.Indented, WorkFiles.jsonSettings));
-            else
-                GD.Print($"error returned for writing message at {location}: {result}");
-            file.Close();
+            // var location = ProjectSettings.HasSetting(Consts.SETTING_RESULTS_SUMMARY)
+            //     ? ProjectSettings.GetSetting(Consts.SETTING_RESULTS_SUMMARY).ToString()
+            //     : Consts.SETTING_RESULTS_SUMMARY_DEF;
+            // var file = new Godot.File();
+            // var result = file.Open(location, Godot.File.ModeFlags.Write);
+            // if (result == Error.Ok)
+            //     file.StoreString(JsonConvert.SerializeObject(testSummary, Formatting.Indented, WorkFiles.jsonSettings));
+            // else
+            //     GD.Print($"error returned for writing message at {location}: {result}");
+            // file.Close();
         }
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
-            EmitSignal(nameof(OnProcess));
-            Update();
+            EmitSignal(SignalName.OnProcess);
+            //Update();
+            base._Process(delta);
         }
 
-        public override void _PhysicsProcess(float delta)
+        public override void _PhysicsProcess(double delta)
         {
-            EmitSignal(nameof(OnPhysicsProcess));
+            EmitSignal(SignalName.OnPhysicsProcess);
         }
 
-        public override void _Draw()
-        {
-            while (drawRequests.TryDequeue(out var request))
-                request(this);
-            EmitSignal(nameof(OnDrawRequestDone));
-        }
+        // public override void _Draw()
+        // {
+        //     while (drawRequests.TryDequeue(out var request))
+        //         request(this);
+        //     EmitSignal(nameof(OnDrawRequestDoneEventHandler));
+        // }
     }
 }

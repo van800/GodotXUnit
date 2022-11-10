@@ -6,11 +6,10 @@
 ;   [section] ; section goes between []
 ;   param=value ; assign values to parameters
 
-config_version=4
+config_version=5
 
-_global_script_classes=[  ]
-_global_script_class_icons={
-}
+_global_script_classes=[]
+_global_script_class_icons={}
 
 [GodotXUnit]
 
@@ -22,11 +21,16 @@ results_summary="res://TestResults.json"
 
 config/name="GodotXUnit"
 run/main_scene="res://addons/GodotXUnit/runner/GodotTestRunnerScene.tscn"
+config/features=PackedStringArray("4.0", "C#")
 config/icon="res://icon.png"
+
+[dotnet]
+
+project/assembly_name="GodotXUnit"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "GodotXUnit" )
+enabled=PackedStringArray("GodotXUnit")
 
 [mono]
 
