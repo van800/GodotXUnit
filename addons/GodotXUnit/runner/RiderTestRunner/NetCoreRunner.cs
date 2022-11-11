@@ -25,36 +25,8 @@ namespace RiderTestRunner
         private string _runnerAssemblyPath;
         public override async void _Ready()
         {
-            var pluginCtx = AssemblyLoadContext.GetLoadContext(GetType().Assembly);
-            var ourCtx = AssemblyLoadContext.Default;
-            
-            ourCtx.Resolving += (context, name) =>
-            {
-                if (name.FullName.Contains("GodotXUnit"))
-                {
-                    var basePath = "/home/ivan-shakhov/Work/GodotXUnit/.godot/mono/temp/bin/Debug/";
-                    var filePath = Path.Combine(basePath, name.Name + ".dll");
-                    if (File.Exists(filePath))
-                        return context.LoadFromAssemblyPath(filePath);
-            
-                    //var asm = pluginCtx.LoadFromAssemblyName(name);
-                    //if (asm != null)
-                        //return asm;
-                }
-            
-                return null;
-            };
-            
-            var gduAssembly = ourCtx.LoadFromAssemblyName(typeof(NetRunnerHack).Assembly.GetName());
-            var gduType = gduAssembly.GetType(typeof(NetRunnerHack).FullName);
-            gduType.GetMethod(nameof(NetRunnerHack.SetGdu)).Invoke(null, new []{this});
-            
-            Console.WriteLine("AssemblyLoadContext_Ready_This:"+ ourCtx);
-            Console.WriteLine("AssemblyLoadContext_Ready:"+ AssemblyLoadContext.GetLoadContext(typeof(GDU).Assembly));
-            Console.WriteLine("AppDomain_Ready: "+ AppDomain.CurrentDomain.Id);
-            Console.WriteLine("CurrentProcess_Ready: "+ System.Diagnostics.Process.GetCurrentProcess().Id);
-            
-            //GDU.Instance = this; // for GodotXUnit https://github.com/fledware/GodotXUnit/issues/8#issuecomment-929849478
+            var godotLoadContext = AssemblyLoadContext.GetLoadContext(typeof(GDU).Assembly);
+            GDU.Instance = this; // for GodotXUnit https://github.com/fledware/GodotXUnit/issues/8#issuecomment-929849478
    
             var textNode = GetNode<RichTextLabel>("RichTextLabel");
             foreach (var arg in OS.GetCmdlineArgs())
@@ -68,12 +40,10 @@ namespace RiderTestRunner
             var unitTestArgs = OS.GetCmdlineArgs()[4].Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries).ToArray();
             _runnerAssemblyPath = OS.GetCmdlineArgs()[2];
             
-            ourCtx!.Resolving += OnResolving;
+            godotLoadContext!.Resolving += OnResolving;
 
-            var assembly = ourCtx.LoadFromAssemblyPath(_runnerAssemblyPath);
+            var assembly = godotLoadContext.LoadFromAssemblyPath(_runnerAssemblyPath);
             assembly.EntryPoint.Invoke(null, new []{unitTestArgs});
-            //AppDomain.CurrentDomain.ExecuteAssembly(_runnerAssemblyPath, unitTestArgs);
-            //AppDomain.CurrentDomain.ExecuteAssemblyByName(assembly.GetName(), unitTestArgs); 
             GetTree().Quit();
         }
 
